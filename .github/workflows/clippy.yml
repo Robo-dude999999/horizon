@@ -1,0 +1,37 @@
+name: Rust Clippy
+
+on:
+  push:
+    branches:
+      - "world_type/customization_api"
+  pull_request:
+    branches:
+      - "world_type/customization_api"
+
+permissions:
+  contents: read
+
+jobs:
+  clippy:
+    name: Format and Clippy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev libudev-dev
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+
+      - name: Run Clippy
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
